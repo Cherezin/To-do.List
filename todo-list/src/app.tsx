@@ -1,4 +1,4 @@
-import { ArrowRight, Circle, CircleCheck, X } from "lucide-react"
+import { ArrowRight, Check, Circle, CircleCheck, Pencil, X } from "lucide-react"
 import { useState } from "react"
 
 interface Task{
@@ -11,11 +11,11 @@ interface Task{
 export function App() {
   const [task, setTask] = useState('')
   const [tasks, setTasks] = useState<Task[]>([])
-  //const [editText, setEditText] =  useState<Task[]>([])
-
+ 
 
 
     function addTask(){
+
       if(task.trim() !== ""){
         const newTask = {
           id: tasks.length,
@@ -38,6 +38,21 @@ export function App() {
       ))
     }
 
+    function toggleEditTask (id: number){
+      setTasks(tasks.map (task => task.id === id ? 
+        {...task, isEditing: !task.isEditing} : task
+        ))
+    }
+
+    function updateTask(id: number, newText: string ){
+      setTasks(tasks.map (task => task.id === id ?
+        {...task, text: newText} : task)
+      )}
+
+
+
+
+
   return (
     <div className="flex items-center justify-center h-screen bg-pattern bg-no-repeat bg-center">
       <div className="max-w-3xl w-600 px-6 text-center space-y-10">
@@ -51,8 +66,9 @@ export function App() {
               <input 
               type="text" 
               value={task}
-              onChange={(e) => setTask(e.target.value)} // Atualiza o estado task quando o valor do input muda
+              onChange={(e) => setTask(e.target.value)}
               placeholder="Adicione uma tarefa" 
+              autoFocus
               className="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"/>
               <button onClick={addTask}>
               <ArrowRight />
@@ -62,26 +78,36 @@ export function App() {
          
         <ul>
           <div className='space-y-4'>
-
             
-              {tasks.map(task => (
-                <li key={task.id}>
-                
-                  <div className='h-16 px-4 rounded-xl flex items-center shadow-shape gap-3 bg-orange-400'>
-                     <button onClick={() => TaskCompleted(task.id)} >{task.isDone ? <CircleCheck className="text-green-700"/> : <Circle /> }</button>
-                    <span >
-                      {task.text}
-                    </span>
-                    <button onClick={() => {removeTask(task.id)}} className="ml-auto">
-                      <X className="text-red-700"/>
-                    </button>
-                  </div>
-                </li>
-              ))}
+            {tasks.map(task => (
+              <li key={task.id}>
               
+                <div className='h-16 px-4 rounded-xl flex items-center shadow-shape gap-3 bg-orange-400'>
+                  <button onClick={() => TaskCompleted(task.id)} >{task.isDone ? <CircleCheck className="text-green-700"/> : <Circle /> }</button>
+                  {task.isEditing ? (
+                    <input
+                      type="text"
+                      value={task.text}
+                      className="bg-transparent placeholder-zinc-50 text-zinc-50 outline-none"
+                      onChange={(e) => updateTask(task.id, e.target.value)}
+                      placeholder="Edite a tarefa" 
+                      autoFocus
+                    />
+                  ) : (<span> {task.text} </span>)}
+                <div className="ml-auto flex gap-2">
+                  <button onClick={() => {toggleEditTask(task.id)}} className=" ml-auto rounded-lg">{task.isEditing ? <Check className="text-green-700"/> : <Pencil className="size-6"/>}</button>
+                  <button onClick={() => {removeTask(task.id)}} className=" ml-auto rounded-lg bg-orange-300 hover:bg-red-300">
+                    <X className="text-red-700"/>
+                  </button>
+                </div> 
+                </div>
+              </li>
+            ))}
+            
+            
 
           </div>
-          </ul>
+        </ul>
       </div>
     </div>
     
