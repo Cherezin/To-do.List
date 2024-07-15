@@ -62,6 +62,7 @@ export function App() {
               </span>
               <button onClick={() => removeTask(task.id)} className="ml-auto">
                 <X />
+                .
               </button>
             </div>
           ))}
