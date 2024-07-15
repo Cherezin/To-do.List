@@ -1,15 +1,17 @@
-import { ArrowRight, X } from "lucide-react"
+import { ArrowRight, Circle, CircleCheck, X } from "lucide-react"
 import { useState } from "react"
 
 interface Task{
   id: number;
   text: string;
   isDone: boolean;
+  isEditing: boolean;
 }
 
 export function App() {
   const [task, setTask] = useState('')
   const [tasks, setTasks] = useState<Task[]>([])
+  //const [editText, setEditText] =  useState<Task[]>([])
 
 
 
@@ -19,6 +21,7 @@ export function App() {
           id: tasks.length,
           text: task,
           isDone: false,
+          isEditing: false,
         }
         setTasks([...tasks, newTask]);
         setTask('')
@@ -29,6 +32,11 @@ export function App() {
       setTasks(tasks.filter( task => task.id !== id))
     }
 
+    function TaskCompleted(id: number){
+      setTasks(tasks.map ( task => task.id === id ?
+        {...task, isDone: !task.isDone} : task
+      ))
+    }
 
   return (
     <div className="flex items-center justify-center h-screen bg-pattern bg-no-repeat bg-center">
@@ -50,20 +58,30 @@ export function App() {
               <ArrowRight />
               </button>
           </div>
-        </div>  
-
-        <div className='space-y-4'>
-          {tasks.map(task => (
-            <div className='h-16 px-4 rounded-xl flex items-center shadow-shape gap-3 bg-orange-400'>
-              <span >
-                {task.text}
-              </span>
-              <button onClick={() => {removeTask(task.id)}} className="ml-auto">
-                <X />
-              </button>
-            </div>
-          ))}
         </div>
+         
+        <ul>
+          <div className='space-y-4'>
+
+            
+              {tasks.map(task => (
+                <li key={task.id}>
+                
+                  <div className='h-16 px-4 rounded-xl flex items-center shadow-shape gap-3 bg-orange-400'>
+                     <button onClick={() => TaskCompleted(task.id)} >{task.isDone ? <CircleCheck className="text-green-700"/> : <Circle /> }</button>
+                    <span >
+                      {task.text}
+                    </span>
+                    <button onClick={() => {removeTask(task.id)}} className="ml-auto">
+                      <X className="text-red-700"/>
+                    </button>
+                  </div>
+                </li>
+              ))}
+              
+
+          </div>
+          </ul>
       </div>
     </div>
     
