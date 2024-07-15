@@ -25,6 +25,10 @@ export function App() {
       }
     }
 
+    function removeTask(id: number){
+      setTasks(tasks.filter( task => task.id !== id))
+    }
+
 
   return (
     <div className="flex items-center justify-center h-screen bg-pattern bg-no-repeat bg-center">
@@ -54,7 +58,7 @@ export function App() {
               <span >
                 {task.text}
               </span>
-              <button className="ml-auto">
+              <button onClick={() => {removeTask(task.id)}} className="ml-auto">
                 <X />
               </button>
             </div>
