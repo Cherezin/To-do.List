@@ -1,12 +1,29 @@
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, X } from "lucide-react"
 import { useState } from "react"
 
-export function App() {
-  const [isTaskAdd, setIsTaskAdd] = useState(false)
+interface Task{
+  id: number;
+  text: string;
+  isDone: boolean;
+}
 
-  function addtask(){
-    setIsTaskAdd(true)
-  }
+export function App() {
+  const [task, setTask] = useState('')
+  const [tasks, setTasks] = useState<Task[]>([])
+
+
+
+    function addTask(){
+      if(task.trim() !== ""){
+        const newTask = {
+          id: tasks.length,
+          text: task,
+          isDone: false,
+        }
+        setTasks([...tasks, newTask]);
+        setTask('')
+      }
+    }
 
 
   return (
@@ -21,19 +38,27 @@ export function App() {
           <div className='flex items-center gap-2 flex-1'>
               <input 
               type="text" 
+              value={task}
+              onChange={(e) => setTask(e.target.value)} // Atualiza o estado task quando o valor do input muda
               placeholder="Adicione uma tarefa" 
               className="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"/>
-              <button onClick={addtask}>
+              <button onClick={addTask}>
               <ArrowRight />
               </button>
           </div>
         </div>  
 
         <div className='space-y-4'>
-
-          {isTaskAdd &&(
-            <p>oi</p>
-          )}
+          {tasks.map(task => (
+            <div className='h-16 px-4 rounded-xl flex items-center shadow-shape gap-3 bg-orange-400'>
+              <span >
+                {task.text}
+              </span>
+              <button className="ml-auto">
+                <X />
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
