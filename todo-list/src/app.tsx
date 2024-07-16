@@ -12,6 +12,8 @@ export function App() {
   const [task, setTask] = useState('')
   const [tasks, setTasks] = useState<Task[]>([])
   const [verification, setVerification] = useState(false)
+  const [confirmModal, setConfirmModal] = useState(false)
+  const [taskIdToDelete, setTaskIdToDelete] = useState<number | null>(null);
 
 
     function addTask(){
@@ -32,7 +34,16 @@ export function App() {
     }
 
     function removeTask(id: number){
-      setTasks(tasks.filter( task => task.id !== id))
+      setConfirmModal(true)
+      setTaskIdToDelete(id)
+    }
+
+    function confirmRemoveTask(){
+        if(taskIdToDelete !== null){
+          setTasks(tasks.filter( task => task.id !== taskIdToDelete))
+          setConfirmModal(false)
+          setTaskIdToDelete(null)
+      }
     }
 
     function TaskCompleted(id: number){
@@ -48,6 +59,9 @@ export function App() {
     }
 
     function updateTask(id: number, newText: string ){
+      const verify = tasks.some(task => task.text === newText)
+      if(verify) return setVerification(true)
+
       setTasks(tasks.map (task => task.id === id ?
         {...task, text: newText} : task)
       )}
@@ -56,6 +70,11 @@ export function App() {
         setVerification(false)
       }
 
+      function closeConfirmModal(){
+        setConfirmModal(false)
+      }
+
+      
 
 
   return (
@@ -101,12 +120,14 @@ export function App() {
                   ) : (<span> {task.text} </span>)}
                 <div className="ml-auto flex gap-2">
                   <button onClick={() => {toggleEditTask(task.id)}} className=" ml-auto rounded-lg">{task.isEditing ? <Check className="text-green-700"/> : <Pencil className="size-6"/>}</button>
-                  <button onClick={() => {removeTask(task.id)}} className=" ml-auto rounded-lg bg-orange-300 hover:bg-red-300">
+                  <button onClick={() => {removeTask(task.id), setConfirmModal(true)}} className=" ml-auto rounded-lg bg-orange-300 hover:bg-red-300">
                     <X className="text-red-700"/>
                   </button>
                 </div> 
                 </div>
               </li>
+
+              
             ))}
             
             {verification && (
@@ -118,6 +139,19 @@ export function App() {
                     </div>
                 </div>
               </div>
+            )}
+
+            {confirmModal && (
+              <div className='fixed inset-0 bg-black/60 flex items-center justify-center'>
+              <div className="max-w-lg rounded-xl py-6 px-5 shadow-shape bg-zinc-900 space-y-5">
+                <h2 className="text-2xl font-semibold mb-6">Tem certeza que deseja excluir essa tarefa?</h2>
+                <div className="flex justify-center space-x-4">
+                  <button onClick={confirmRemoveTask} className="bg-orange-600 py-3 w-1/2 px-6 rounded-lg hover:bg-orange-700">Sim</button>
+                  <button onClick={closeConfirmModal} className="border border-white py-3 px-6 w-1/2 rounded-lg hover:bg-zinc-800">Não</button>
+                </div>
+              </div>
+            </div>
+            
             )}
 
           </div>
