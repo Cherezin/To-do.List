@@ -1,5 +1,5 @@
-import { ArrowRight, Check, Circle, CircleCheck, Pencil, X } from "lucide-react"
-import { useState } from "react"
+import { ArrowRight, Check, Circle, CircleCheck, Pencil, Trash2, X } from "lucide-react"
+import { useRef, useState } from "react"
 
 interface Task{
   id: number;
@@ -14,7 +14,9 @@ export function App() {
   const [verification, setVerification] = useState(false)
   const [confirmModal, setConfirmModal] = useState(false)
   const [taskIdToDelete, setTaskIdToDelete] = useState<number | null>(null);
-
+  const [isTrash, setIsTrash] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isTrashModal, setIsTrashModal] = useState(false)
 
     function addTask(){
       const existingTask = tasks.some(existingTask => existingTask.text === task.trim())
@@ -31,6 +33,12 @@ export function App() {
         setTasks([...tasks, newTask]);
         setTask('')
       }
+
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+
+      setIsTrash(true)
     }
 
     function removeTask(id: number){
@@ -74,6 +82,18 @@ export function App() {
         setConfirmModal(false)
       }
 
+      function deleteAll(){
+        setTasks([])
+        setIsTrash(false)
+        setIsTrashModal(false)
+      }
+
+      function closeTrashModal(){
+        setIsTrashModal(false)
+      }
+      function openTrashModal(){
+        setIsTrashModal(true)
+      }
       
 
 
@@ -85,19 +105,26 @@ export function App() {
           <h1 className="text-zinc-100 text-3xl font-semibold">Lista de Tarefas</h1>
           <p className="text-zinc-400 text-sm">Organize melhor seu dia adicionando tarefas com a nossa lista de tarefas!</p>
         </div>
-        <div className='h-16 bg-zinc-900 px-4 rounded-xl flex items-center shadow-shape gap-3'>
+        <div className="flex gap-3">
+        <div className='h-16 bg-zinc-900 px-4 flex-1 rounded-xl flex items-center shadow-shape gap-3'>
           <div className='flex items-center gap-2 flex-1'>
               <input 
               type="text" 
               value={task}
               onChange={(e) => setTask(e.target.value)}
               placeholder="Adicione uma tarefa" 
-              autoFocus
+              ref={inputRef}
               className="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"/>
               <button onClick={addTask}>
               <ArrowRight />
               </button>
           </div>
+        </div>
+        {isTrash && (
+            <button onClick={openTrashModal} className="px-1 rounded-lg border border-zinc-700 hover:bg-red-900">
+              <Trash2 />
+            </button>
+          )}
         </div>
          
         <ul>
@@ -151,9 +178,20 @@ export function App() {
                 </div>
               </div>
             </div>
-            
             )}
 
+            {isTrashModal && (
+              <div className='fixed inset-0 bg-black/60 flex items-center justify-center'>
+              <div className="max-w-lg rounded-xl py-6 px-5 shadow-shape bg-zinc-900 space-y-5">
+                <h2 className="text-2xl font-semibold mb-6">Você vai apagar toda lista de tarefas, deseja fazer isso?</h2>
+                <div className="flex justify-center space-x-4">
+                  <button onClick={deleteAll} className="bg-orange-600 py-3 w-1/2 px-6 rounded-lg hover:bg-orange-700">Sim</button>
+                  <button onClick={closeTrashModal} className="border border-white py-3 px-6 w-1/2 rounded-lg hover:bg-zinc-800">Não</button>
+                </div>
+              </div>
+            </div>
+            )}
+          
           </div>
         </ul>
       </div>
